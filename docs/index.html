@@ -13,7 +13,7 @@
     --amber:#f59e0b;--amber-bg:rgba(245,158,11,.12);--amber-border:rgba(245,158,11,.25);
     --teal:#14b8a6;--teal-bg:rgba(20,184,166,.12);--teal-border:rgba(20,184,166,.25);
     --gray:#6b7280;--gray-bg:rgba(107,114,128,.12);--gray-border:rgba(107,114,128,.25);
-    --green:#22c55e;--red:#ef4444;
+    --green:#22c55e;--red:#ef4444;--purple:#a855f7;
     --radius:12px;--radius-sm:8px;
   }
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
@@ -21,10 +21,11 @@
 
   /* Header */
   .header{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:16px 24px}
-  .header-inner{max-width:1200px;margin:0 auto}
+  .header-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
   .header h1{font-size:20px;font-weight:700;letter-spacing:-.3px}
   .header h1 span{color:var(--blue)}
   .header p{font-size:13px;color:var(--text2);margin-top:2px}
+  .header-user{font-size:13px;color:var(--teal);background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.25);padding:4px 12px;border-radius:20px}
 
   /* Progress */
   .progress-section{max-width:1200px;margin:24px auto 0;padding:0 24px}
@@ -72,6 +73,7 @@
   .badge-time{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
   .card-dep{font-size:12px;color:var(--text3);margin-top:8px}
   .card-dep span{color:var(--text2)}
+  .comment-count{font-size:11px;color:var(--purple);margin-left:6px}
 
   /* Status toggle */
   .status-toggle{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap;flex-shrink:0}
@@ -95,6 +97,37 @@
   .chevron{margin-left:auto;color:var(--text3);transition:transform .2s;font-size:18px;line-height:1}
   .card.open .chevron{transform:rotate(180deg)}
 
+  /* Comments */
+  .comments-section{margin-top:16px;border-top:1px solid var(--border);padding-top:14px}
+  .comments-section h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px}
+  .comment-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+  .comment-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px}
+  .comment-item.type-suggestion{border-left:3px solid var(--purple)}
+  .comment-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .comment-author{font-size:12px;font-weight:600;color:var(--teal)}
+  .comment-time{font-size:11px;color:var(--text3)}
+  .comment-type-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:6px}
+  .comment-type-badge.badge-comment{background:var(--surface);color:var(--text3);border:1px solid var(--border)}
+  .comment-type-badge.badge-suggestion{background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.25)}
+  .comment-body{font-size:13px;color:var(--text2);white-space:pre-wrap;word-break:break-word}
+  .comment-delete{font-size:11px;color:var(--text3);cursor:pointer;margin-left:8px;opacity:0;transition:opacity .2s}
+  .comment-item:hover .comment-delete{opacity:1}
+  .comment-delete:hover{color:var(--red)}
+
+  .comment-form{display:flex;flex-direction:column;gap:8px}
+  .comment-form-row{display:flex;gap:8px}
+  .comment-input{flex:1;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;resize:none;font-family:inherit;min-height:38px}
+  .comment-input:focus{border-color:var(--blue)}
+  .comment-input::placeholder{color:var(--text3)}
+  .comment-type-toggle{display:flex;gap:4px}
+  .type-btn{padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+  .type-btn.active-comment{background:var(--surface2);color:var(--text2);border-color:var(--text3)}
+  .type-btn.active-suggestion{background:rgba(168,85,247,.12);color:var(--purple);border-color:rgba(168,85,247,.25)}
+  .comment-submit{padding:8px 18px;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s;white-space:nowrap}
+  .comment-submit:hover{opacity:.9}
+  .comment-submit:disabled{opacity:.4;cursor:default}
+  .no-comments{font-size:12px;color:var(--text3);font-style:italic;margin-bottom:8px}
+
   /* Legend */
   .legend{max-width:1200px;margin:0 auto;padding:0 24px 12px;display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text3)}
   .legend-item{display:flex;align-items:center;gap:5px}
@@ -105,22 +138,25 @@
   .login-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px 36px;width:100%;max-width:380px;text-align:center}
   .login-box h1{font-size:24px;font-weight:700;margin-bottom:4px}
   .login-box h1 span{color:var(--blue)}
-  .login-box p{font-size:13px;color:var(--text2);margin-bottom:28px}
+  .login-box p{font-size:13px;color:var(--text2);margin-bottom:20px}
   .login-box input{width:100%;padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px;outline:none;transition:border-color .2s}
   .login-box input:focus{border-color:var(--blue)}
   .login-box input::placeholder{color:var(--text3)}
   .login-box button{width:100%;margin-top:14px;padding:12px;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s}
   .login-box button:hover{opacity:.9}
   .login-error{color:var(--red);font-size:13px;margin-top:12px;display:none}
+  .login-box label{display:block;text-align:left;font-size:13px;color:var(--text2);margin-bottom:6px;margin-top:16px}
   .app-content{display:none}
 
   @media(max-width:600px){
     .header{padding:14px 16px}
+    .header-inner{flex-direction:column;align-items:flex-start;gap:6px}
     .progress-section,.filters,.timeline-info,.phases,.legend{padding-left:16px;padding-right:16px}
     .phase-grid{grid-template-columns:1fr}
     .timeline-info{flex-direction:column}
     .card-row{flex-direction:column;gap:6px}
     .login-box{margin:0 16px;padding:32px 24px}
+    .comment-form-row{flex-direction:column}
   }
 </style>
 </head>
@@ -132,6 +168,8 @@
     <h1>Scroll<span>ToBid</span></h1>
     <p>Dev Tracker — Enter access code</p>
     <input type="password" id="passInput" placeholder="Access code" autocomplete="off">
+    <label for="nameInput">Your name</label>
+    <input type="text" id="nameInput" placeholder="e.g. Nikolas" autocomplete="off">
     <button onclick="tryLogin()">Enter</button>
     <div class="login-error" id="loginError">Wrong code. Try again.</div>
   </div>
@@ -142,8 +180,11 @@
 
 <div class="header">
   <div class="header-inner">
-    <h1>Scroll<span>ToBid</span> — Dev Tracker</h1>
-    <p>TikTok-style 60-second auction platform &middot; React Native + Supabase</p>
+    <div>
+      <h1>Scroll<span>ToBid</span> — Dev Tracker</h1>
+      <p>TikTok-style 60-second auction platform &middot; React Native + Supabase</p>
+    </div>
+    <div class="header-user" id="headerUser"></div>
   </div>
 </div>
 
@@ -181,207 +222,170 @@
 </div><!-- end app-content -->
 
 <script>
-// Auth gate
-const PASS_HASH = "a]kQ9#vR2x";
+// ── Supabase client (lightweight REST + Realtime) ──
+const SB_URL = "https://dsmprjvgkcmjplmchsrg.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzbXByanZna2NtanBsbWNoc3JnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzYyMTEsImV4cCI6MjA4ODc1MjIxMX0.EOqNUIAlKJ6ulSgUFfoutQvI93sqhXxn50FGAFan1S0";
+const SB_HEADERS = {"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json","Prefer":"return=representation"};
+
+async function sbFetch(path,opts={}){
+  const res = await fetch(SB_URL+"/rest/v1/"+path,{headers:SB_HEADERS,...opts});
+  if(!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+// ── Comments cache ──
+let allComments = [];
+async function loadComments(){
+  try{
+    allComments = await sbFetch("tracker_comments?order=created_at.asc");
+  }catch(e){console.error("Failed to load comments:",e);allComments=[];}
+}
+function commentsForTask(taskId){return allComments.filter(c=>c.task_id===taskId)}
+
+async function postComment(taskId,body,type){
+  const author = currentUser;
+  const row = await sbFetch("tracker_comments",{method:"POST",body:JSON.stringify({task_id:taskId,author,body,type})});
+  if(Array.isArray(row)) allComments.push(...row);
+  else if(row) allComments.push(row);
+  render();
+}
+
+async function deleteComment(id){
+  await sbFetch("tracker_comments?id=eq."+id,{method:"DELETE"});
+  allComments = allComments.filter(c=>c.id!==id);
+  render();
+}
+
+// ── Realtime via Supabase Realtime (SSE/WebSocket) ──
+function setupRealtime(){
+  try{
+    const ws = new WebSocket(SB_URL.replace("https://","wss://")+"/realtime/v1/websocket?apikey="+SB_KEY+"&vsn=1.0.0");
+    ws.onopen = ()=>{
+      ws.send(JSON.stringify({topic:"realtime:public:tracker_comments",event:"phx_join",payload:{config:{broadcast:{self:false},postgres_changes:[{event:"*",schema:"public",table:"tracker_comments"}]}},ref:"1"}));
+      // Heartbeat
+      setInterval(()=>{ws.send(JSON.stringify({topic:"phoenix",event:"heartbeat",payload:{},ref:"hb"}))},30000);
+    };
+    ws.onmessage = (msg)=>{
+      try{
+        const data = JSON.parse(msg.data);
+        if(data.event === "postgres_changes"){
+          loadComments().then(()=>render());
+        }
+      }catch(e){}
+    };
+    ws.onerror = ()=>{};
+    ws.onclose = ()=>{setTimeout(setupRealtime,5000)};
+  }catch(e){}
+}
+
+// ── Auth gate ──
+let currentUser = "";
 function hashPass(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return h}
 const CORRECT_HASH = hashPass("triole123456");
 
 function tryLogin(){
   const val = document.getElementById("passInput").value;
-  if(hashPass(val)===CORRECT_HASH){
+  const name = document.getElementById("nameInput").value.trim();
+  if(hashPass(val)===CORRECT_HASH && name){
     sessionStorage.setItem("stb-auth","1");
+    sessionStorage.setItem("stb-user",name);
+    currentUser = name;
     showApp();
-  } else {
+  } else if(hashPass(val)!==CORRECT_HASH){
+    document.getElementById("loginError").textContent = "Wrong code. Try again.";
     document.getElementById("loginError").style.display="block";
-    document.getElementById("passInput").value="";
-    document.getElementById("passInput").focus();
+  } else {
+    document.getElementById("loginError").textContent = "Enter your name.";
+    document.getElementById("loginError").style.display="block";
   }
 }
 document.addEventListener("DOMContentLoaded",()=>{
-  document.getElementById("passInput").addEventListener("keydown",e=>{if(e.key==="Enter")tryLogin()});
-  if(sessionStorage.getItem("stb-auth")==="1") showApp();
+  document.getElementById("passInput").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("nameInput").focus()});
+  document.getElementById("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")tryLogin()});
+  if(sessionStorage.getItem("stb-auth")==="1" && sessionStorage.getItem("stb-user")){
+    currentUser = sessionStorage.getItem("stb-user");
+    showApp();
+  }
 });
 function showApp(){
   document.getElementById("loginOverlay").style.display="none";
   document.getElementById("appContent").style.display="block";
-  render();
+  document.getElementById("headerUser").textContent = currentUser;
+  loadComments().then(()=>{render();setupRealtime()});
 }
 
+// ── Data ──
 const DATA = [
   {
     phase: 0, title: "Foundation",
     tasks: [
-      {
-        id:"tech-stack",name:"Tech stack setup",type:"infra",time:"1 week",
-        depends:"Nothing — start here",
-        stack:["React Native","Node.js","Supabase","Stripe Connect","Shippo"],
-        subtasks:["Init React Native project (iOS + Android)","Set up Supabase project (DB + Auth)","Configure Stripe Connect sandbox","Set up Git repo and CI/CD pipeline","Define folder structure and coding conventions"]
-      },
-      {
-        id:"design-system",name:"Design system",type:"frontend",time:"1 week",
-        depends:"Tech stack setup",
-        stack:["React Native","Figma"],
-        subtasks:["Define color tokens (dark/light mode)","Typography scale","Spacing system","Base component library (Button, Card, Input)","Navigation skeleton (5 tabs)"]
-      }
+      {id:"tech-stack",name:"Tech stack setup",type:"infra",time:"1 week",depends:"Nothing — start here",stack:["React Native","Node.js","Supabase","Stripe Connect","Shippo"],subtasks:["Init React Native project (iOS + Android)","Set up Supabase project (DB + Auth)","Configure Stripe Connect sandbox","Set up Git repo and CI/CD pipeline","Define folder structure and coding conventions"]},
+      {id:"design-system",name:"Design system",type:"frontend",time:"1 week",depends:"Tech stack setup",stack:["React Native","Figma"],subtasks:["Define color tokens (dark/light mode)","Typography scale","Spacing system","Base component library (Button, Card, Input)","Navigation skeleton (5 tabs)"]}
     ]
   },
   {
     phase: 1, title: "Core Auction Engine",
     tasks: [
-      {
-        id:"auth",name:"Auth & onboarding",type:"fullstack",time:"1 week",
-        depends:"Design system",
-        stack:["React Native","Supabase Auth"],
-        subtasks:["Sign up (email, Apple ID, Google)","Phone verification (SMS)","Interest picker (select categories)","Budget comfort selection","Free starter pack trigger","Tutorial auction screen","Push notification permission prompt"]
-      },
-      {
-        id:"db-schema",name:"Database schema",type:"backend",time:"1 week",
-        depends:"Tech stack setup",
-        stack:["Supabase (Postgres)"],
-        subtasks:["users, profiles, tiers","listings, auction_types","bids, bid_history","transactions, escrow_holds","shipping_labels, tracking","notifications, activity_log"]
-      },
-      {
-        id:"bidding-engine",name:"Realtime bidding engine",type:"backend",time:"2 weeks",
-        depends:"Database schema",
-        stack:["Node.js","Supabase Realtime","WebSockets"],
-        subtasks:["WebSocket server setup","Bid placement and validation","Countdown timer management","Snipe protection (extend 10s on late bids)","Proxy/max bid logic","Conflict resolution (simultaneous bids)","Bid broadcast to all connected clients","Auction end trigger and winner selection"]
-      }
+      {id:"auth",name:"Auth & onboarding",type:"fullstack",time:"1 week",depends:"Design system",stack:["React Native","Supabase Auth"],subtasks:["Sign up (email, Apple ID, Google)","Phone verification (SMS)","Interest picker (select categories)","Budget comfort selection","Free starter pack trigger","Tutorial auction screen","Push notification permission prompt"]},
+      {id:"db-schema",name:"Database schema",type:"backend",time:"1 week",depends:"Tech stack setup",stack:["Supabase (Postgres)"],subtasks:["users, profiles, tiers","listings, auction_types","bids, bid_history","transactions, escrow_holds","shipping_labels, tracking","notifications, activity_log"]},
+      {id:"bidding-engine",name:"Realtime bidding engine",type:"backend",time:"2 weeks",depends:"Database schema",stack:["Node.js","Supabase Realtime","WebSockets"],subtasks:["WebSocket server setup","Bid placement and validation","Countdown timer management","Snipe protection (extend 10s on late bids)","Proxy/max bid logic","Conflict resolution (simultaneous bids)","Bid broadcast to all connected clients","Auction end trigger and winner selection"]}
     ]
   },
   {
     phase: 2, title: "Feed & Cards",
     tasks: [
-      {
-        id:"auction-card",name:"Auction card UI",type:"frontend",time:"2 weeks",
-        depends:"Realtime bidding engine, Auth & onboarding",
-        stack:["React Native","Reanimated"],
-        subtasks:["Item photo gallery (swipeable, zoomable)","Realtime bid amount + bidder names","Countdown timer (turns red last 10s)","Bid button (one-tap + quick presets +$1/$5/$10)","Seller info strip (name, rating, badge)","Market value indicator (Retail $180 / Market $95)","Shipping cost display","Watchlist heart + share + flag actions","Authentication badge","Auction type badge"]
-      },
-      {
-        id:"home-feed",name:"Home feed (Tab 1)",type:"fullstack",time:"2 weeks",
-        depends:"Auction card UI",
-        stack:["React Native","Node.js"],
-        subtasks:["Infinite vertical scroll","Feed API endpoint (paginated)","Category filter pills","Sort toggle (ending soon, most bids, lowest price)","Price range filter","Basic personalization (by category interest)","Feed health system (auto-inject cards if auctions low)","Coming soon cards","Just sold replay cards","Engagement cards (price check, would you cop)"]
-      }
+      {id:"auction-card",name:"Auction card UI",type:"frontend",time:"2 weeks",depends:"Realtime bidding engine, Auth & onboarding",stack:["React Native","Reanimated"],subtasks:["Item photo gallery (swipeable, zoomable)","Realtime bid amount + bidder names","Countdown timer (turns red last 10s)","Bid button (one-tap + quick presets +$1/$5/$10)","Seller info strip (name, rating, badge)","Market value indicator (Retail $180 / Market $95)","Shipping cost display","Watchlist heart + share + flag actions","Authentication badge","Auction type badge"]},
+      {id:"home-feed",name:"Home feed (Tab 1)",type:"fullstack",time:"2 weeks",depends:"Auction card UI",stack:["React Native","Node.js"],subtasks:["Infinite vertical scroll","Feed API endpoint (paginated)","Category filter pills","Sort toggle (ending soon, most bids, lowest price)","Price range filter","Basic personalization (by category interest)","Feed health system (auto-inject cards if auctions low)","Coming soon cards","Just sold replay cards","Engagement cards (price check, would you cop)"]}
     ]
   },
   {
     phase: 3, title: "Payments & Escrow",
     tasks: [
-      {
-        id:"stripe",name:"Stripe Connect",type:"backend",time:"2 weeks",
-        depends:"Realtime bidding engine, Database schema",
-        stack:["Stripe Connect","Node.js"],
-        subtasks:["Buyer payment capture on auction win","Stripe Connect seller onboarding (KYC)","Escrow hold logic (funds held until buyer confirms)","Platform fee deduction (12%)","Seller payout release after buyer confirms","Refund processing","Auto-confirm after 48h buyer silence","1099-K reporting setup"]
-      },
-      {
-        id:"shipping",name:"Shipping integration",type:"backend",time:"1 week",
-        depends:"Stripe Connect",
-        stack:["Shippo API","Node.js"],
-        subtasks:["Auto-generate prepaid label on auction close","Carrier selection (USPS, UPS, FedEx)","Label delivery to seller in-app","Real-time tracking for buyer and seller","Shipping cost calculation displayed pre-bid","Flip shipping (original seller ships direct to final buyer)"]
-      }
+      {id:"stripe",name:"Stripe Connect",type:"backend",time:"2 weeks",depends:"Realtime bidding engine, Database schema",stack:["Stripe Connect","Node.js"],subtasks:["Buyer payment capture on auction win","Stripe Connect seller onboarding (KYC)","Escrow hold logic (funds held until buyer confirms)","Platform fee deduction (12%)","Seller payout release after buyer confirms","Refund processing","Auto-confirm after 48h buyer silence","1099-K reporting setup"]},
+      {id:"shipping",name:"Shipping integration",type:"backend",time:"1 week",depends:"Stripe Connect",stack:["Shippo API","Node.js"],subtasks:["Auto-generate prepaid label on auction close","Carrier selection (USPS, UPS, FedEx)","Label delivery to seller in-app","Real-time tracking for buyer and seller","Shipping cost calculation displayed pre-bid","Flip shipping (original seller ships direct to final buyer)"]}
     ]
   },
   {
     phase: 4, title: "Seller Tools",
     tasks: [
-      {
-        id:"sell-tab",name:"Sell tab (Tab 3)",type:"fullstack",time:"2 weeks",
-        depends:"Stripe Connect, Shipping integration",
-        stack:["React Native","Node.js","Google Vision API"],
-        subtasks:["Camera capture + guided 6-photo upload","AI item identification (brand, model, condition)","Auto-fill title, description, category, starting price","Condition grading selector","Auction type picker (Standard, Flash, Premium, Dutch, Mystery)","Reserve price + Buy It Now options","Schedule or go live now","Shipping method setup","Fee preview (net earnings calculator)","Listing preview before publish","Draft saving","Promoted listing upsell"]
-      },
-      {
-        id:"seller-dash",name:"Seller dashboard",type:"frontend",time:"1 week",
-        depends:"Sell tab",
-        stack:["React Native"],
-        subtasks:["Active listings with live bid counts","Items sold awaiting shipment (print label button)","Items shipped + tracking","Completed sales (revenue, fees, net payout)","Payout history","Unsold items + relist suggestions","Seller stats (avg rating, sell-through rate)"]
-      }
+      {id:"sell-tab",name:"Sell tab (Tab 3)",type:"fullstack",time:"2 weeks",depends:"Stripe Connect, Shipping integration",stack:["React Native","Node.js","Google Vision API"],subtasks:["Camera capture + guided 6-photo upload","AI item identification (brand, model, condition)","Auto-fill title, description, category, starting price","Condition grading selector","Auction type picker (Standard, Flash, Premium, Dutch, Mystery)","Reserve price + Buy It Now options","Schedule or go live now","Shipping method setup","Fee preview (net earnings calculator)","Listing preview before publish","Draft saving","Promoted listing upsell"]},
+      {id:"seller-dash",name:"Seller dashboard",type:"frontend",time:"1 week",depends:"Sell tab",stack:["React Native"],subtasks:["Active listings with live bid counts","Items sold awaiting shipment (print label button)","Items shipped + tracking","Completed sales (revenue, fees, net payout)","Payout history","Unsold items + relist suggestions","Seller stats (avg rating, sell-through rate)"]}
     ]
   },
   {
     phase: 5, title: "Activity & Profiles",
     tasks: [
-      {
-        id:"activity-tab",name:"Activity tab (Tab 4)",type:"frontend",time:"1.5 weeks",
-        depends:"Stripe Connect, Shipping integration",
-        stack:["React Native"],
-        subtasks:["Currently winning + outbid alerts","Auctions won and lost (near-miss messaging)","Items in transit with tracking","Items delivered + confirm button (48h window)","Purchase history","Notification center","Active disputes"]
-      },
-      {
-        id:"profile-tab",name:"Profile tab (Tab 5)",type:"frontend",time:"1.5 weeks",
-        depends:"Auth & onboarding",
-        stack:["React Native"],
-        subtasks:["Profile header (avatar, bio, badges, tier)","Trust score + verification badges","Stats (wins, sales, flips, best deal)","Collection / showcase grid","Wishlist (public + private)","Social (followers, following, DMs)","Account settings (payments, addresses, notifications)","Privacy + data controls","Referral code"]
-      }
+      {id:"activity-tab",name:"Activity tab (Tab 4)",type:"frontend",time:"1.5 weeks",depends:"Stripe Connect, Shipping integration",stack:["React Native"],subtasks:["Currently winning + outbid alerts","Auctions won and lost (near-miss messaging)","Items in transit with tracking","Items delivered + confirm button (48h window)","Purchase history","Notification center","Active disputes"]},
+      {id:"profile-tab",name:"Profile tab (Tab 5)",type:"frontend",time:"1.5 weeks",depends:"Auth & onboarding",stack:["React Native"],subtasks:["Profile header (avatar, bio, badges, tier)","Trust score + verification badges","Stats (wins, sales, flips, best deal)","Collection / showcase grid","Wishlist (public + private)","Social (followers, following, DMs)","Account settings (payments, addresses, notifications)","Privacy + data controls","Referral code"]}
     ]
   },
   {
     phase: 6, title: "Notifications & Post-Auction",
     tasks: [
-      {
-        id:"push-notif",name:"Push notifications",type:"fullstack",time:"1 week",
-        depends:"Home feed, Stripe Connect",
-        stack:["Firebase Cloud Messaging","Node.js"],
-        subtasks:["Outbid alerts (realtime, highest priority)","Auction ending soon (30s warning)","Won / lost result notification","Item shipped / delivered","Streak at risk","Price drop on watchlist item","Friend activity (\"Sarah just won for $38\")","Payout received","Creator drop reminders"]
-      },
-      {
-        id:"post-auction",name:"Post-auction screens",type:"frontend",time:"1 week",
-        depends:"Stripe Connect, Push notifications",
-        stack:["React Native"],
-        subtasks:["Win celebration animation + confetti","Win card generation (item, price paid, savings %)","One-tap share to Instagram / TikTok / X","Choose action: Keep / Flip / Gift","Near-miss messaging (\"Outbid by $2\")","Find similar — 5 live alternatives shown","Set sniper alert from loss screen"]
-      }
+      {id:"push-notif",name:"Push notifications",type:"fullstack",time:"1 week",depends:"Home feed, Stripe Connect",stack:["Firebase Cloud Messaging","Node.js"],subtasks:["Outbid alerts (realtime, highest priority)","Auction ending soon (30s warning)","Won / lost result notification","Item shipped / delivered","Streak at risk","Price drop on watchlist item","Friend activity (\"Sarah just won for $38\")","Payout received","Creator drop reminders"]},
+      {id:"post-auction",name:"Post-auction screens",type:"frontend",time:"1 week",depends:"Stripe Connect, Push notifications",stack:["React Native"],subtasks:["Win celebration animation + confetti","Win card generation (item, price paid, savings %)","One-tap share to Instagram / TikTok / X","Choose action: Keep / Flip / Gift","Near-miss messaging (\"Outbid by $2\")","Find similar — 5 live alternatives shown","Set sniper alert from loss screen"]}
     ]
   },
   {
     phase: 7, title: "Search & Explore",
     tasks: [
-      {
-        id:"search-tab",name:"Search tab (Tab 2)",type:"fullstack",time:"2 weeks",
-        depends:"Home feed, Push notifications",
-        stack:["React Native","Supabase Full-text Search"],
-        subtasks:["Search bar (text + voice)","Gallery grid results (2-column thumbnail)","Tap thumbnail enters full auction card","Swipe stays in search feed (not back to main feed)","End of results: set alert + near-match suggestions","Category browse grid with subcategories","Trending section (items, categories, price movers)","Saved search alerts (push notification on new match)","Zero-result logging (demand intelligence for team)"]
-      }
+      {id:"search-tab",name:"Search tab (Tab 2)",type:"fullstack",time:"2 weeks",depends:"Home feed, Push notifications",stack:["React Native","Supabase Full-text Search"],subtasks:["Search bar (text + voice)","Gallery grid results (2-column thumbnail)","Tap thumbnail enters full auction card","Swipe stays in search feed (not back to main feed)","End of results: set alert + near-match suggestions","Category browse grid with subcategories","Trending section (items, categories, price movers)","Saved search alerts (push notification on new match)","Zero-result logging (demand intelligence for team)"]}
     ]
   },
   {
     phase: 8, title: "Gamification & Social",
     tasks: [
-      {
-        id:"gamification",name:"Gamification layer",type:"fullstack",time:"1.5 weeks",
-        depends:"Profile tab, Post-auction screens",
-        stack:["React Native","Node.js"],
-        subtasks:["XP system (bid, win, sell, flip, refer, daily login)","Tier progression Bronze → Silver → Gold → Platinum → Diamond","Streak tracking (bid streak, win streak, flip streak)","Streak at-risk push notifications","Daily and weekly challenges","Leaderboards (global, category, friends)","Badges (First Flip, $1K Profit Club, 100 Wins, etc)","Profile cosmetics (earned frames, animated avatars)"]
-      },
-      {
-        id:"social",name:"Social layer",type:"frontend",time:"1 week",
-        depends:"Profile tab, Push notifications",
-        stack:["React Native","Supabase Realtime"],
-        subtasks:["Follow / unfollow sellers","Following feed (wins, listings, flips from people you follow)","Direct messaging (buyer-seller chat)","Friend groups and clubs","Club leaderboards and challenges","Block / mute users","Social proof banners (\"4 friends watching this auction\")"]
-      }
+      {id:"gamification",name:"Gamification layer",type:"fullstack",time:"1.5 weeks",depends:"Profile tab, Post-auction screens",stack:["React Native","Node.js"],subtasks:["XP system (bid, win, sell, flip, refer, daily login)","Tier progression Bronze → Silver → Gold → Platinum → Diamond","Streak tracking (bid streak, win streak, flip streak)","Streak at-risk push notifications","Daily and weekly challenges","Leaderboards (global, category, friends)","Badges (First Flip, $1K Profit Club, 100 Wins, etc)","Profile cosmetics (earned frames, animated avatars)"]},
+      {id:"social",name:"Social layer",type:"frontend",time:"1 week",depends:"Profile tab, Push notifications",stack:["React Native","Supabase Realtime"],subtasks:["Follow / unfollow sellers","Following feed (wins, listings, flips from people you follow)","Direct messaging (buyer-seller chat)","Friend groups and clubs","Club leaderboards and challenges","Block / mute users","Social proof banners (\"4 friends watching this auction\")"]}
     ]
   },
   {
     phase: 9, title: "Admin & Launch Prep",
     tasks: [
-      {
-        id:"admin",name:"Admin dashboard",type:"fullstack",time:"1 week",
-        depends:"Sell tab, Stripe Connect, Push notifications",
-        stack:["React (web)","Node.js"],
-        subtasks:["Flagged listing review queue","Dispute resolution (view evidence, decide outcome)","User management (suspend, ban, adjust tier)","Feed health monitor (live auction count, bids per auction)","Financial reporting (GMV, revenue, payouts, fraud losses)","Seller approval queue","Analytics dashboard (retention, DAU, conversion)"]
-      },
-      {
-        id:"fraud",name:"Fraud detection",type:"backend",time:"1 week",
-        depends:"Realtime bidding engine, Stripe Connect",
-        stack:["Node.js","Supabase"],
-        subtasks:["Shill bidding detection (same accounts bidding on same seller)","Device fingerprinting (prevent multi-account abuse)","IP and signup pattern analysis","Price anomaly flagging","Velocity monitoring (unusual spikes in activity)","Automatic account hold on suspicious flag","AI photo comparison via Google Vision API"]
-      },
-      {
-        id:"qa",name:"QA & App Store",type:"infra",time:"2 weeks",
-        depends:"Admin dashboard, Fraud detection, Gamification layer, Social layer",
-        stack:["iOS TestFlight","Google Play Beta"],
-        subtasks:["Bidding edge cases (simultaneous bids, timer expiry, payment failure)","Escrow release logic testing","Push notification reliability","Feed performance under load","iOS and Android device matrix testing","App Store screenshots and description","Privacy policy and age rating (18+)","Apple App Store submission (1-2 week review)","Google Play submission"]
-      }
+      {id:"admin",name:"Admin dashboard",type:"fullstack",time:"1 week",depends:"Sell tab, Stripe Connect, Push notifications",stack:["React (web)","Node.js"],subtasks:["Flagged listing review queue","Dispute resolution (view evidence, decide outcome)","User management (suspend, ban, adjust tier)","Feed health monitor (live auction count, bids per auction)","Financial reporting (GMV, revenue, payouts, fraud losses)","Seller approval queue","Analytics dashboard (retention, DAU, conversion)"]},
+      {id:"fraud",name:"Fraud detection",type:"backend",time:"1 week",depends:"Realtime bidding engine, Stripe Connect",stack:["Node.js","Supabase"],subtasks:["Shill bidding detection (same accounts bidding on same seller)","Device fingerprinting (prevent multi-account abuse)","IP and signup pattern analysis","Price anomaly flagging","Velocity monitoring (unusual spikes in activity)","Automatic account hold on suspicious flag","AI photo comparison via Google Vision API"]},
+      {id:"qa",name:"QA & App Store",type:"infra",time:"2 weeks",depends:"Admin dashboard, Fraud detection, Gamification layer, Social layer",stack:["iOS TestFlight","Google Play Beta"],subtasks:["Bidding edge cases (simultaneous bids, timer expiry, payment failure)","Escrow release logic testing","Push notification reliability","Feed performance under load","iOS and Android device matrix testing","App Store screenshots and description","Privacy policy and age rating (18+)","Apple App Store submission (1-2 week review)","Google Play submission"]}
     ]
   }
 ];
@@ -396,29 +400,38 @@ const STATUS_CYCLE = ["not-started","in-progress","done"];
 const STATUS_LABEL = {"not-started":"Not Started","in-progress":"In Progress","done":"Done"};
 const STATUS_ICON = {"not-started":"○","in-progress":"◑","done":"●"};
 
-// Load saved statuses
-function loadStatuses(){
-  try{return JSON.parse(localStorage.getItem("stb-statuses"))||{}}catch(e){return{}}
-}
+function loadStatuses(){try{return JSON.parse(localStorage.getItem("stb-statuses"))||{}}catch(e){return{}}}
 function saveStatuses(s){localStorage.setItem("stb-statuses",JSON.stringify(s))}
 let statuses = loadStatuses();
-
 function getStatus(id){return statuses[id]||"not-started"}
 function cycleStatus(id,e){
   e.stopPropagation();
   const cur = getStatus(id);
   const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(cur)+1)%3];
-  statuses[id]=next;
-  saveStatuses(statuses);
-  render();
+  statuses[id]=next;saveStatuses(statuses);render();
 }
 
 let activeFilter = "all";
+// Track comment type per card
+let commentTypes = {};
+
+function timeAgo(dateStr){
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now-d)/1000);
+  if(diff<60) return "just now";
+  if(diff<3600) return Math.floor(diff/60)+"m ago";
+  if(diff<86400) return Math.floor(diff/3600)+"h ago";
+  return Math.floor(diff/86400)+"d ago";
+}
+
+function escapeHtml(s){
+  const d=document.createElement("div");d.textContent=s;return d.innerHTML;
+}
 
 function render(){
   const container = document.getElementById("phases");
   container.innerHTML = "";
-
   let total=0, done=0;
 
   DATA.forEach(phase=>{
@@ -428,7 +441,6 @@ function render(){
     const phaseEl = document.createElement("div");
     phaseEl.className = "phase";
     phaseEl.innerHTML = `<div class="phase-header"><span class="phase-num">PHASE ${phase.phase}</span><span class="phase-title">${phase.title}</span></div>`;
-
     const grid = document.createElement("div");
     grid.className = "phase-grid";
 
@@ -437,17 +449,23 @@ function render(){
       const st = getStatus(task.id);
       if(st==="done") done++;
       const tm = TYPE_MAP[task.type];
+      const taskComments = commentsForTask(task.id);
+      const commentCountHtml = taskComments.length ? `<span class="comment-count">${taskComments.length} comment${taskComments.length>1?"s":""}</span>` : "";
+      const cType = commentTypes[task.id] || "comment";
 
       const card = document.createElement("div");
       card.className = `card type-${tm.cls}`;
       card.dataset.id = task.id;
-      card.onclick = ()=>card.classList.toggle("open");
+      card.onclick = (e)=>{
+        if(e.target.closest(".comments-section")) return;
+        card.classList.toggle("open");
+      };
 
       card.innerHTML = `
         <div class="card-top">
           <div class="card-row">
             <div>
-              <div class="card-title">${task.name}</div>
+              <div class="card-title">${task.name}${commentCountHtml}</div>
               <div class="card-badges">
                 <span class="badge ${tm.badge}">${tm.label}</span>
                 <span class="badge badge-time">${task.time}</span>
@@ -471,6 +489,35 @@ function render(){
             <h4>Tasks (${task.subtasks.length})</h4>
             <ul>${task.subtasks.map(s=>`<li>${s}</li>`).join("")}</ul>
           </div>
+          <div class="comments-section">
+            <h4>Comments & Suggestions</h4>
+            <div class="comment-list">
+              ${taskComments.length === 0 ? '<div class="no-comments">No comments yet — be the first!</div>' :
+                taskComments.map(c=>`
+                  <div class="comment-item ${c.type==='suggestion'?'type-suggestion':''}">
+                    <div class="comment-meta">
+                      <div>
+                        <span class="comment-author">${escapeHtml(c.author)}</span>
+                        <span class="comment-type-badge badge-${c.type}">${c.type==='suggestion'?'Suggestion':'Comment'}</span>
+                        ${c.author===currentUser?`<span class="comment-delete" onclick="deleteComment('${c.id}')">delete</span>`:''}
+                      </div>
+                      <span class="comment-time">${timeAgo(c.created_at)}</span>
+                    </div>
+                    <div class="comment-body">${escapeHtml(c.body)}</div>
+                  </div>
+                `).join("")}
+            </div>
+            <div class="comment-form">
+              <div class="comment-type-toggle">
+                <button class="type-btn ${cType==='comment'?'active-comment':''}" onclick="setCommentType('${task.id}','comment')">Comment</button>
+                <button class="type-btn ${cType==='suggestion'?'active-suggestion':''}" onclick="setCommentType('${task.id}','suggestion')">Suggestion</button>
+              </div>
+              <div class="comment-form-row">
+                <textarea class="comment-input" id="input-${task.id}" placeholder="Write a ${cType}..." rows="1" onkeydown="handleCommentKey(event,'${task.id}')"></textarea>
+                <button class="comment-submit" onclick="submitComment('${task.id}')">Send</button>
+              </div>
+            </div>
+          </div>
         </div>
       `;
       grid.appendChild(card);
@@ -480,11 +527,37 @@ function render(){
     container.appendChild(phaseEl);
   });
 
-  // Update progress
   const pct = total?Math.round((done/total)*100):0;
   document.getElementById("progressBar").style.width = pct+"%";
   document.getElementById("progressPct").textContent = pct+"%";
   document.getElementById("progressCount").textContent = `${done} / ${total} tasks done`;
+}
+
+function setCommentType(taskId,type){
+  commentTypes[taskId]=type;
+  render();
+  // Re-open the card
+  const card = document.querySelector(`.card[data-id="${taskId}"]`);
+  if(card) card.classList.add("open");
+}
+
+function handleCommentKey(e,taskId){
+  if(e.key==="Enter" && !e.shiftKey){e.preventDefault();submitComment(taskId)}
+}
+
+async function submitComment(taskId){
+  const input = document.getElementById("input-"+taskId);
+  if(!input) return;
+  const body = input.value.trim();
+  if(!body) return;
+  input.disabled = true;
+  const type = commentTypes[taskId]||"comment";
+  await postComment(taskId,body,type);
+  // Re-open card after render
+  setTimeout(()=>{
+    const card = document.querySelector(`.card[data-id="${taskId}"]`);
+    if(card) card.classList.add("open");
+  },10);
 }
 
 // Filters
@@ -495,8 +568,6 @@ document.getElementById("filters").addEventListener("click",e=>{
   activeFilter = e.target.dataset.filter;
   render();
 });
-
-render();
 </script>
 </body>
 </html>
