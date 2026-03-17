@@ -69,7 +69,7 @@
   /* Card */
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .25s ease}
   .card:hover{border-color:var(--text3);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
-  .card.open{grid-column:1 / -1}
+  .card.open{grid-column:1 / -1 !important;width:100%}
   .card.type-frontend{border-left:3px solid var(--blue)}
   .card.type-backend{border-left:3px solid var(--amber)}
   .card.type-fullstack{border-left:3px solid var(--teal)}
@@ -762,6 +762,12 @@ function render() {
             el.classList.remove("open");
             delete openCards[taskId];
           } else {
+            // Close all other cards first
+            var allOpen = document.querySelectorAll(".card.open");
+            for (var oi = 0; oi < allOpen.length; oi++) {
+              allOpen[oi].classList.remove("open");
+            }
+            openCards = {};
             el.classList.add("open");
             openCards[taskId] = true;
           }
