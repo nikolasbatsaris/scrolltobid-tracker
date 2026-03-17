@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScrollToBid — Session Logs</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;
+    --text:#e4e6f0;--text2:#9498b0;--text3:#636782;
+    --blue:#3b82f6;--blue-bg:rgba(59,130,246,.12);--blue-border:rgba(59,130,246,.25);
+    --amber:#f59e0b;--amber-bg:rgba(245,158,11,.12);--amber-border:rgba(245,158,11,.25);
+    --teal:#14b8a6;--teal-bg:rgba(20,184,166,.12);--teal-border:rgba(20,184,166,.25);
+    --gray:#6b7280;--gray-bg:rgba(107,114,128,.12);--gray-border:rgba(107,114,128,.25);
+    --green:#22c55e;--red:#ef4444;--purple:#a855f7;
+    --radius:12px;--radius-sm:8px;
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* Login screen */
+  .login-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center}
+  .login-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px 36px;width:100%;max-width:380px;text-align:center}
+  .login-box h1{font-size:24px;font-weight:700;margin-bottom:4px}
+  .login-box h1 span{color:var(--blue)}
+  .login-box p{font-size:13px;color:var(--text2);margin-bottom:20px}
+  .login-box input{width:100%;padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px;outline:none;transition:border-color .2s}
+  .login-box input:focus{border-color:var(--blue)}
+  .login-box input::placeholder{color:var(--text3)}
+  .login-box button{width:100%;margin-top:14px;padding:12px;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s}
+  .login-box button:hover{opacity:.9}
+  .login-error{color:var(--red);font-size:13px;margin-top:12px;display:none}
+  .login-box label{display:block;text-align:left;font-size:13px;color:var(--text2);margin-bottom:6px;margin-top:16px}
+  .app-content{display:none}
+
+  /* Header */
+  .header{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:16px 24px}
+  .header-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+  .header-left h1{font-size:20px;font-weight:700;letter-spacing:-.3px}
+  .header-left h1 span{color:var(--blue)}
+  .header-left p{font-size:13px;color:var(--text2);margin-top:2px}
+  .header-right{display:flex;align-items:center;gap:12px}
+  .header-user{font-size:13px;color:var(--teal);background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.25);padding:4px 12px;border-radius:20px}
+  .logout-btn{font-size:12px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);padding:4px 10px;border-radius:20px;cursor:pointer}
+  .logout-btn:hover{color:var(--red);border-color:var(--red)}
+  .back-btn{font-size:13px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);padding:5px 14px;border-radius:20px;text-decoration:none;transition:all .2s}
+  .back-btn:hover{color:var(--text);border-color:var(--text3);text-decoration:none}
+
+  /* Controls bar */
+  .controls{max-width:1200px;margin:20px auto 0;padding:0 24px;display:flex;flex-direction:column;gap:14px}
+
+  /* Filter rows */
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .filter-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);white-space:nowrap;min-width:60px}
+  .filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .filter-btn:hover{border-color:var(--text3);color:var(--text)}
+  .filter-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+  .filter-btn.author-manager.active{background:var(--blue);border-color:var(--blue)}
+  .filter-btn.author-developer.active{background:var(--amber);border-color:var(--amber);color:#000}
+  .filter-btn.author-tester.active{background:var(--teal);border-color:var(--teal);color:#000}
+
+  /* Date pickers */
+  .date-inputs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .date-inputs input[type="date"]{padding:6px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;cursor:pointer;transition:border-color .2s;color-scheme:dark}
+  .date-inputs input[type="date"]:focus{border-color:var(--blue)}
+  .date-sep{font-size:13px;color:var(--text3)}
+
+  /* Search + sort row */
+  .search-sort-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .search-wrap{position:relative;flex:1;max-width:420px}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;width:16px;height:16px}
+  .search-input{width:100%;padding:9px 14px 9px 34px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
+  .search-input:focus{border-color:var(--blue)}
+  .search-input::placeholder{color:var(--text3)}
+  .sort-btn{padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .2s}
+  .sort-btn:hover{border-color:var(--text3);color:var(--text)}
+  .sort-btn.asc{background:var(--surface2);border-color:var(--text3);color:var(--text)}
+
+  /* Results count bar */
+  .results-bar{max-width:1200px;margin:16px auto 0;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+  .results-count{font-size:13px;color:var(--text2)}
+  .results-count strong{color:var(--text)}
+  .clear-filters-btn{font-size:12px;color:var(--text3);cursor:pointer;background:none;border:none;padding:0}
+  .clear-filters-btn:hover{color:var(--red)}
+
+  /* Log cards */
+  .logs-list{max-width:1200px;margin:16px auto 40px;padding:0 24px;display:flex;flex-direction:column;gap:14px}
+
+  .log-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;transition:border-color .2s}
+  .log-card:hover{border-color:var(--text3)}
+  .log-card.author-manager{border-left:3px solid var(--blue)}
+  .log-card.author-developer{border-left:3px solid var(--amber)}
+  .log-card.author-tester{border-left:3px solid var(--teal)}
+  .log-card.author-other{border-left:3px solid var(--gray)}
+
+  .log-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+  .log-author-badge{font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:.2px}
+  .log-author-badge.author-manager{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+  .log-author-badge.author-developer{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+  .log-author-badge.author-tester{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
+  .log-author-badge.author-other{background:var(--gray-bg);color:var(--gray);border:1px solid var(--gray-border)}
+  .log-datetime{font-size:12px;color:var(--text3)}
+  .log-summary{font-size:13px;color:var(--text2);white-space:pre-wrap;word-break:break-word;line-height:1.65}
+
+  /* Loading / empty states */
+  .state-msg{max-width:1200px;margin:60px auto;padding:0 24px;text-align:center;color:var(--text3);font-size:15px}
+  .state-msg .spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Scroll to top */
+  .scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:50;transition:opacity .2s}
+  .scroll-top:hover{opacity:.85}
+
+  @media(max-width:640px){
+    .header{padding:14px 16px}
+    .header-inner{flex-direction:column;align-items:flex-start;gap:8px}
+    .controls,.results-bar,.logs-list{padding-left:16px;padding-right:16px}
+    .filter-row{gap:6px}
+    .search-sort-row{flex-direction:column;align-items:stretch}
+    .search-wrap{max-width:100%}
+    .date-inputs{flex-direction:column;align-items:stretch}
+    .login-box{margin:0 16px;padding:32px 24px}
+  }
+</style>
+</head>
+<body>
+
+<!-- Login Gate -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h1>Scroll<span>ToBid</span></h1>
+    <p>Session Logs — Enter access code</p>
+    <input type="password" id="passInput" placeholder="Access code" autocomplete="off">
+    <label for="nameInput">Your name</label>
+    <input type="text" id="nameInput" placeholder="e.g. Nikolas" autocomplete="off">
+    <button onclick="tryLogin()">Enter</button>
+    <div class="login-error" id="loginError">Wrong code. Try again.</div>
+  </div>
+</div>
+
+<!-- App Content (hidden until login) -->
+<div class="app-content" id="appContent">
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>Scroll<span>ToBid</span> — Session Logs</h1>
+      <p>All development session entries</p>
+    </div>
+    <div class="header-right">
+      <a href="index.html" class="back-btn">Back to Tracker</a>
+      <div class="header-user" id="headerUser"></div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="controls" id="controls">
+
+  <!-- Author filters -->
+  <div class="filter-row" id="authorFilterRow">
+    <span class="filter-label">Author</span>
+    <button class="filter-btn active" id="author-all" onclick="setAuthorFilter('all')">All</button>
+    <button class="filter-btn author-manager" id="author-manager" onclick="setAuthorFilter('manager')">Claude (Manager)</button>
+    <button class="filter-btn author-developer" id="author-developer" onclick="setAuthorFilter('developer')">Claude (Developer)</button>
+    <button class="filter-btn author-tester" id="author-tester" onclick="setAuthorFilter('tester')">Claude (Tester)</button>
+    <span id="extraAuthorBtns"></span>
+  </div>
+
+  <!-- Date quick filters -->
+  <div class="filter-row">
+    <span class="filter-label">Period</span>
+    <button class="filter-btn active" id="date-all" onclick="setDateFilter('all')">All Time</button>
+    <button class="filter-btn" id="date-today" onclick="setDateFilter('today')">Today</button>
+    <button class="filter-btn" id="date-week" onclick="setDateFilter('week')">This Week</button>
+    <button class="filter-btn" id="date-month" onclick="setDateFilter('month')">This Month</button>
+  </div>
+
+  <!-- Custom date range -->
+  <div class="filter-row">
+    <span class="filter-label">Custom</span>
+    <div class="date-inputs">
+      <input type="date" id="fromDate" onchange="onCustomDateChange()" title="From date">
+      <span class="date-sep">to</span>
+      <input type="date" id="toDate" onchange="onCustomDateChange()" title="To date">
+    </div>
+  </div>
+
+  <!-- Search + Sort -->
+  <div class="search-sort-row">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search summaries..." oninput="onSearch()">
+    </div>
+    <button class="sort-btn" id="sortBtn" onclick="toggleSort()">Newest first &#9650;</button>
+  </div>
+
+</div>
+
+<div class="results-bar">
+  <div class="results-count" id="resultsCount">Loading...</div>
+  <button class="clear-filters-btn" id="clearBtn" onclick="clearFilters()" style="display:none">Clear filters</button>
+</div>
+
+<div class="logs-list" id="logsList">
+  <div class="state-msg"><div class="spinner"></div><br>Loading session logs...</div>
+</div>
+
+</div><!-- /app-content -->
+
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8679;</button>
+
+<script>
+// ── Auth ──
+var currentUser = "";
+function hashPass(s) {
+  var h = 0;
+  for (var i = 0; i < s.length; i++) {
+    h = ((h << 5) - h) + s.charCodeAt(i);
+    h = h & h;
+  }
+  return h;
+}
+var CORRECT_HASH = hashPass("triole123456");
+
+function tryLogin() {
+  var val = document.getElementById("passInput").value;
+  var name = document.getElementById("nameInput").value.trim();
+  if (hashPass(val) === CORRECT_HASH && name) {
+    sessionStorage.setItem("stb-auth", "1");
+    sessionStorage.setItem("stb-user", name);
+    currentUser = name;
+    showApp();
+  } else if (hashPass(val) !== CORRECT_HASH) {
+    document.getElementById("loginError").textContent = "Wrong code. Try again.";
+    document.getElementById("loginError").style.display = "block";
+  } else {
+    document.getElementById("loginError").textContent = "Please enter your name.";
+    document.getElementById("loginError").style.display = "block";
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem("stb-auth");
+  sessionStorage.removeItem("stb-user");
+  currentUser = "";
+  document.getElementById("appContent").style.display = "none";
+  document.getElementById("loginOverlay").style.display = "flex";
+}
+
+function showApp() {
+  document.getElementById("loginOverlay").style.display = "none";
+  document.getElementById("appContent").style.display = "block";
+  document.getElementById("headerUser").textContent = currentUser;
+  loadSessions();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("passInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") document.getElementById("nameInput").focus();
+  });
+  document.getElementById("nameInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") tryLogin();
+  });
+  if (sessionStorage.getItem("stb-auth") === "1" && sessionStorage.getItem("stb-user")) {
+    currentUser = sessionStorage.getItem("stb-user");
+    showApp();
+  }
+  window.addEventListener("scroll", function() {
+    var btn = document.getElementById("scrollTopBtn");
+    if (window.scrollY > 300) {
+      btn.style.display = "flex";
+    } else {
+      btn.style.display = "none";
+    }
+  });
+});
+
+// ── Supabase config ──
+var SUPA_URL = "https://dsmprjvgkcmjplmchsrg.supabase.co";
+var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzbXByanZna2NtanBsbWNoc3JnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzYyMTEsImV4cCI6MjA4ODc1MjIxMX0.EOqNUIAlKJ6ulSgUFfoutQvI93sqhXxn50FGAFan1S0";
+
+// ── State ──
+var allSessions = [];
+var authorFilter = "all";
+var dateFilter = "all";
+var customFrom = "";
+var customTo = "";
+var searchText = "";
+var sortAsc = false;
+var extraAuthors = [];
+
+// ── Load ──
+function loadSessions() {
+  var url = SUPA_URL + "/rest/v1/tracker_sessions?select=id,author,summary,created_at&order=created_at.desc&limit=1000";
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.setRequestHeader("apikey", SUPA_KEY);
+  xhr.setRequestHeader("Authorization", "Bearer " + SUPA_KEY);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          allSessions = data;
+          detectExtraAuthors();
+          applyFiltersAndRender();
+        } catch(e) {
+          showError("Failed to parse session data.");
+        }
+      } else {
+        showError("Failed to load sessions (HTTP " + xhr.status + ").");
+      }
+    }
+  };
+  xhr.send();
+}
+
+function showError(msg) {
+  document.getElementById("logsList").innerHTML = '<div class="state-msg">' + msg + '</div>';
+  document.getElementById("resultsCount").textContent = "";
+}
+
+// ── Author classification ──
+var KNOWN_AUTHORS = {
+  "claude (manager)": "manager",
+  "manager": "manager",
+  "claude (developer)": "developer",
+  "developer": "developer",
+  "claude (tester)": "tester",
+  "tester": "tester"
+};
+
+function classifyAuthor(name) {
+  if (!name) return "other";
+  var lower = name.toLowerCase().trim();
+  if (KNOWN_AUTHORS[lower] !== undefined) return KNOWN_AUTHORS[lower];
+  return "other";
+}
+
+function detectExtraAuthors() {
+  var seen = {};
+  extraAuthors = [];
+  for (var i = 0; i < allSessions.length; i++) {
+    var a = allSessions[i].author || "";
+    var cls = classifyAuthor(a);
+    if (cls === "other" && a && !seen[a]) {
+      seen[a] = true;
+      extraAuthors.push(a);
+    }
+  }
+  renderExtraAuthorBtns();
+}
+
+function renderExtraAuthorBtns() {
+  var container = document.getElementById("extraAuthorBtns");
+  var html = "";
+  for (var i = 0; i < extraAuthors.length; i++) {
+    var a = extraAuthors[i];
+    var id = "author-extra-" + i;
+    var activeClass = (authorFilter === "extra:" + a) ? " active" : "";
+    html += '<button class="filter-btn' + activeClass + '" id="' + id + '" onclick="setAuthorFilter(' + "'" + "extra:" + a + "'" + ')">' + escHtml(a) + '</button>';
+  }
+  container.innerHTML = html;
+}
+
+// ── Filters ──
+function setAuthorFilter(val) {
+  authorFilter = val;
+  updateAuthorBtns();
+  applyFiltersAndRender();
+}
+
+function updateAuthorBtns() {
+  var ids = ["author-all", "author-manager", "author-developer", "author-tester"];
+  var vals = ["all", "manager", "developer", "tester"];
+  for (var i = 0; i < ids.length; i++) {
+    var el = document.getElementById(ids[i]);
+    if (el) {
+      if (authorFilter === vals[i]) {
+        el.classList.add("active");
+      } else {
+        el.classList.remove("active");
+      }
+    }
+  }
+  renderExtraAuthorBtns();
+}
+
+function setDateFilter(val) {
+  dateFilter = val;
+  // clear custom date inputs when using quick buttons
+  if (val !== "custom") {
+    document.getElementById("fromDate").value = "";
+    document.getElementById("toDate").value = "";
+    customFrom = "";
+    customTo = "";
+  }
+  var dateIds = ["date-all", "date-today", "date-week", "date-month"];
+  var dateVals = ["all", "today", "week", "month"];
+  for (var i = 0; i < dateIds.length; i++) {
+    var el = document.getElementById(dateIds[i]);
+    if (el) {
+      if (val === dateVals[i]) {
+        el.classList.add("active");
+      } else {
+        el.classList.remove("active");
+      }
+    }
+  }
+  applyFiltersAndRender();
+}
+
+function onCustomDateChange() {
+  customFrom = document.getElementById("fromDate").value;
+  customTo = document.getElementById("toDate").value;
+  if (customFrom || customTo) {
+    dateFilter = "custom";
+    var dateIds = ["date-all", "date-today", "date-week", "date-month"];
+    for (var i = 0; i < dateIds.length; i++) {
+      var el = document.getElementById(dateIds[i]);
+      if (el) el.classList.remove("active");
+    }
+  }
+  applyFiltersAndRender();
+}
+
+function onSearch() {
+  searchText = document.getElementById("searchInput").value.toLowerCase().trim();
+  applyFiltersAndRender();
+}
+
+function toggleSort() {
+  sortAsc = !sortAsc;
+  var btn = document.getElementById("sortBtn");
+  if (sortAsc) {
+    btn.textContent = "Oldest first \u25BC";
+    btn.classList.add("asc");
+  } else {
+    btn.textContent = "Newest first \u25B2";
+    btn.classList.remove("asc");
+  }
+  applyFiltersAndRender();
+}
+
+function clearFilters() {
+  authorFilter = "all";
+  dateFilter = "all";
+  customFrom = "";
+  customTo = "";
+  searchText = "";
+  sortAsc = false;
+  document.getElementById("fromDate").value = "";
+  document.getElementById("toDate").value = "";
+  document.getElementById("searchInput").value = "";
+  document.getElementById("sortBtn").textContent = "Newest first \u25B2";
+  document.getElementById("sortBtn").classList.remove("asc");
+  updateAuthorBtns();
+  var dateIds = ["date-all", "date-today", "date-week", "date-month"];
+  var dateVals = ["all", "today", "week", "month"];
+  for (var i = 0; i < dateIds.length; i++) {
+    var el = document.getElementById(dateIds[i]);
+    if (el) {
+      if (dateVals[i] === "all") {
+        el.classList.add("active");
+      } else {
+        el.classList.remove("active");
+      }
+    }
+  }
+  applyFiltersAndRender();
+}
+
+// ── Date helpers ──
+function startOfDay(d) {
+  var x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function getDateBounds() {
+  var now = new Date();
+  if (dateFilter === "today") {
+    return { from: startOfDay(now), to: new Date(now.getTime() + 86400000) };
+  }
+  if (dateFilter === "week") {
+    var day = now.getDay();
+    var diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    var mon = new Date(now);
+    mon.setDate(diff);
+    return { from: startOfDay(mon), to: new Date(now.getTime() + 86400000) };
+  }
+  if (dateFilter === "month") {
+    var first = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { from: first, to: new Date(now.getTime() + 86400000) };
+  }
+  if (dateFilter === "custom") {
+    var f = customFrom ? new Date(customFrom + "T00:00:00") : null;
+    var t = customTo ? new Date(customTo + "T23:59:59") : null;
+    return { from: f, to: t };
+  }
+  return { from: null, to: null };
+}
+
+// ── Filter + render ──
+function applyFiltersAndRender() {
+  var bounds = getDateBounds();
+  var filtered = [];
+
+  for (var i = 0; i < allSessions.length; i++) {
+    var s = allSessions[i];
+
+    // Author filter
+    if (authorFilter !== "all") {
+      var cls = classifyAuthor(s.author || "");
+      if (authorFilter === "manager" && cls !== "manager") continue;
+      if (authorFilter === "developer" && cls !== "developer") continue;
+      if (authorFilter === "tester" && cls !== "tester") continue;
+      if (authorFilter.indexOf("extra:") === 0) {
+        var extraName = authorFilter.slice(6);
+        if ((s.author || "") !== extraName) continue;
+      }
+    }
+
+    // Date filter
+    if (bounds.from || bounds.to) {
+      var created = new Date(s.created_at);
+      if (bounds.from && created < bounds.from) continue;
+      if (bounds.to && created > bounds.to) continue;
+    }
+
+    // Search
+    if (searchText) {
+      var haystack = (s.summary || "").toLowerCase();
+      if (haystack.indexOf(searchText) === -1) continue;
+    }
+
+    filtered.push(s);
+  }
+
+  // Sort
+  filtered.sort(function(a, b) {
+    var ta = new Date(a.created_at).getTime();
+    var tb = new Date(b.created_at).getTime();
+    return sortAsc ? ta - tb : tb - ta;
+  });
+
+  renderLogs(filtered);
+  updateResultsBar(filtered.length, allSessions.length);
+}
+
+function updateResultsBar(shown, total) {
+  var el = document.getElementById("resultsCount");
+  el.innerHTML = "Showing <strong>" + shown + "</strong> of <strong>" + total + "</strong> entries";
+  var hasFilters = authorFilter !== "all" || dateFilter !== "all" || customFrom || customTo || searchText;
+  document.getElementById("clearBtn").style.display = hasFilters ? "inline" : "none";
+}
+
+// ── Rendering ──
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function formatDateTime(iso) {
+  if (!iso) return "";
+  var d = new Date(iso);
+  var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var mon = months[d.getMonth()];
+  var day = d.getDate();
+  var yr = d.getFullYear();
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  if (h === 0) h = 12;
+  var ms = m < 10 ? "0" + m : "" + m;
+  return mon + " " + day + ", " + yr + " at " + h + ":" + ms + " " + ampm;
+}
+
+function renderLogs(sessions) {
+  var list = document.getElementById("logsList");
+  if (sessions.length === 0) {
+    list.innerHTML = '<div class="state-msg">No log entries match your filters.</div>';
+    return;
+  }
+  var html = "";
+  for (var i = 0; i < sessions.length; i++) {
+    var s = sessions[i];
+    var cls = classifyAuthor(s.author || "");
+    var authorDisplay = escHtml(s.author || "Unknown");
+    var dt = formatDateTime(s.created_at);
+    var summary = escHtml(s.summary || "");
+
+    html += '<div class="log-card author-' + cls + '">';
+    html += '<div class="log-card-header">';
+    html += '<span class="log-author-badge author-' + cls + '">' + authorDisplay + '</span>';
+    html += '<span class="log-datetime">' + dt + '</span>';
+    html += '</div>';
+    html += '<div class="log-summary">' + summary + '</div>';
+    html += '</div>';
+  }
+  list.innerHTML = html;
+}
+</script>
+
+</body>
+</html>

@@ -275,6 +275,7 @@
       <p>462 features &middot; 11 sections &middot; Started March 8, 2026</p>
     </div>
     <div class="header-right">
+      <a href="logs.html" style="font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);text-decoration:none">Logs</a>
       <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">Viewer</button>
       <div class="header-user" id="headerUser"></div>
       <button class="logout-btn" onclick="doLogout()">Logout</button>
@@ -926,7 +927,8 @@ function renderSessions() {
     return;
   }
   var html = "";
-  allSessions.forEach(function(s) {
+  var show = allSessions.slice(0, 3);
+  show.forEach(function(s) {
     var d = new Date(s.created_at);
     var dateStr = d.toLocaleDateString("en-US", {weekday:"short",month:"short",day:"numeric",year:"numeric"}) + " at " + d.toLocaleTimeString("en-US", {hour:"2-digit",minute:"2-digit"});
     html += "<div class=\"sl-entry\">";
@@ -938,6 +940,9 @@ function renderSessions() {
     html += "<div class=\"sl-entry-body\">" + escapeHtml(s.summary) + "</div>";
     html += "</div>";
   });
+  if (allSessions.length > 3) {
+    html += "<a href=\"logs.html\" style=\"display:block;text-align:center;padding:12px;font-size:13px;color:var(--blue);text-decoration:none\">View all " + allSessions.length + " session logs →</a>";
+  }
   container.innerHTML = html;
 }
 
