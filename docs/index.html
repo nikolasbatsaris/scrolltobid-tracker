@@ -187,45 +187,75 @@
   .locked-box p{font-size:14px;color:var(--text2);line-height:1.6}
   .viewer-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--surface2);color:var(--text3);border:1px solid var(--border);margin-left:6px}
 
-  /* Session Log */
-  .session-log{max-width:1200px;margin:24px auto;padding:0 24px}
-  .session-log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;cursor:pointer;user-select:none}
-  .session-log-header h2{font-size:17px;font-weight:700;display:flex;align-items:center;gap:10px}
-  .session-log-header h2 .sl-badge{background:var(--purple);color:#fff;font-size:11px;padding:2px 10px;border-radius:20px;font-weight:600}
-  .session-log-toggle{color:var(--text3);font-size:16px;transition:transform .2s}
-  .session-log.collapsed .session-log-toggle{transform:rotate(-90deg)}
-  .session-log.collapsed .session-log-body{display:none}
-  .session-log-body{display:flex;flex-direction:column;gap:12px}
-  .sl-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
-  .sl-form textarea{width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;min-height:80px}
-  .sl-form textarea:focus{border-color:var(--blue)}
-  .sl-form textarea::placeholder{color:var(--text3)}
-  .sl-form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-  .sl-form-hint{font-size:12px;color:var(--text3)}
-  .sl-submit{padding:8px 20px;border-radius:var(--radius-sm);border:none;background:var(--purple);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
-  .sl-submit:hover{opacity:.9}
-  .sl-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
-  .sl-entry-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  .sl-entry-author{font-size:13px;font-weight:600;color:var(--teal)}
-  .sl-entry-date{font-size:12px;color:var(--text3)}
-  .sl-entry-body{font-size:13px;color:var(--text2);white-space:pre-wrap;word-break:break-word;line-height:1.6}
-  .sl-entry-delete{font-size:11px;color:var(--text3);cursor:pointer;margin-left:8px}
-  .sl-entry-delete:hover{color:var(--red)}
-
   /* Scroll to top */
   .scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:50;transition:opacity .2s}
   .scroll-top:hover{opacity:.85}
 
   @media(max-width:600px){
-    .header{padding:14px 16px}
-    .header-inner{flex-direction:column;align-items:flex-start;gap:6px}
+    /* Prevent horizontal scroll */
+    body{overflow-x:hidden}
+
+    /* Header: stack logo and buttons vertically */
+    .header{padding:12px 16px}
+    .header-inner{flex-direction:column;align-items:flex-start;gap:8px}
+    .header h1{font-size:17px}
+    .header p{font-size:12px}
+    .header-right{display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:100%}
+    .header-user{font-size:12px;padding:4px 10px}
+    .logout-btn{font-size:12px;padding:5px 12px;min-height:32px}
+    .admin-btn{font-size:11px;padding:5px 12px;min-height:32px}
+    .header-right a{font-size:11px;padding:5px 12px;min-height:32px;display:flex;align-items:center}
+
+    /* Consistent side padding across all sections */
     .progress-section,.filters,.search-section,.timeline-info,.phases,.legend{padding-left:16px;padding-right:16px}
+
+    /* Progress bar: smaller text */
+    .progress-stats{font-size:12px}
+    .progress-stats strong{font-size:18px}
+    .progress-detail{font-size:11px;gap:10px;flex-wrap:wrap}
+
+    /* Filters: smaller padding, wrap nicely */
+    .filters{gap:6px}
+    .filter-btn{padding:6px 12px;font-size:12px}
+
+    /* Search: full width */
+    .search-input{max-width:100%;width:100%}
+
+    /* Timeline cards: stack vertically */
+    .timeline-info{flex-direction:column;gap:8px}
+    .timeline-card{min-width:0;font-size:12px;padding:10px 14px}
+    .timeline-card strong{font-size:14px}
+
+    /* Phase header: wrap on small screens */
+    .phase-header{flex-wrap:wrap;gap:8px}
+    .phase-count{margin-left:0;width:100%;font-size:11px}
+
+    /* Card grid: single column */
     .phase-grid{grid-template-columns:1fr}
-    .timeline-info{flex-direction:column}
-    .card-row{flex-direction:column;gap:6px}
-    .login-box{margin:0 16px;padding:32px 24px}
-    .comment-form-row{flex-direction:column}
-    .search-input{max-width:100%}
+
+    /* Card title: truncate overflow */
+    .card-title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+
+    /* Card row: don't force column-direction — keep title+status side-by-side */
+    .card-row{flex-direction:row;align-items:flex-start;gap:8px;flex-wrap:wrap}
+
+    /* Status toggle: bigger touch target */
+    .status-toggle{min-height:44px;padding:8px 12px;font-size:12px;display:inline-flex;align-items:center}
+
+    /* Feature list items: good padding for touch */
+    .exp-section li{padding:8px 36px 8px 24px;font-size:13px}
+
+    /* Feature checkboxes: bigger touch targets */
+    .feature-check{width:28px;height:28px;top:8px;right:0;border-radius:6px;font-size:14px}
+
+    /* Comment section: full-width inputs, bigger send button */
+    .comment-form-row{flex-direction:column;gap:8px}
+    .comment-input{width:100%;font-size:14px}
+    .comment-submit{width:100%;padding:12px;font-size:14px;min-height:44px}
+    .type-btn{padding:8px 14px;font-size:12px;min-height:36px}
+
+    /* Login box */
+    .login-box{margin:0 16px;padding:32px 20px;max-width:100%}
   }
 </style>
 </head>
@@ -317,22 +347,6 @@
   <div class="timeline-card"><strong>Checklist</strong>Click cards to expand. Check off individual features. Toggle card status.</div>
 </div>
 
-<div class="session-log" id="sessionLog">
-  <div class="session-log-header" onclick="toggleSessionLog()">
-    <h2>Session Log <span class="sl-badge" id="slCount">0</span></h2>
-    <span class="session-log-toggle">▾</span>
-  </div>
-  <div class="session-log-body" id="sessionLogBody">
-    <div class="sl-form">
-      <textarea id="slInput" placeholder="What was done this session? (e.g. Built auth flow, fixed bidding timer, set up Stripe sandbox...)"></textarea>
-      <div class="sl-form-actions">
-        <span class="sl-form-hint">Log your work so the team (and Claude) knows what happened</span>
-        <button class="sl-submit" onclick="postSession()">Log Session</button>
-      </div>
-    </div>
-    <div id="sessionEntries"></div>
-  </div>
-</div>
 
 <div class="phases" id="phases"></div>
 
@@ -565,7 +579,6 @@ function showApp() {
   if (sessionStorage.getItem("stb-admin") === "1") isAdmin = true;
   updateAdminUI();
   Promise.all([loadComments(), loadStatuses(), loadChecks()]).then(function() { render(); setupRealtime(); });
-  loadSessions();
 }
 
 // ── Scroll to top button ──
@@ -905,73 +918,6 @@ function submitComment(taskId) {
   var type = commentTypes[taskId] || "comment";
   openCards[taskId] = true;
   postComment(taskId, body, type);
-}
-
-// ── Session Log ──
-var allSessions = [];
-var sessionLogCollapsed = false;
-
-async function loadSessions() {
-  try {
-    allSessions = await sbFetch("tracker_sessions?order=created_at.desc");
-  } catch(e) { allSessions = []; }
-  renderSessions();
-}
-
-function renderSessions() {
-  var container = document.getElementById("sessionEntries");
-  if (!container) return;
-  document.getElementById("slCount").textContent = allSessions.length;
-  if (!allSessions.length) {
-    container.innerHTML = "<div style=\"font-size:13px;color:var(--text3);font-style:italic;padding:8px 0\">No sessions logged yet. Be the first to log what you worked on!</div>";
-    return;
-  }
-  var html = "";
-  var show = allSessions.slice(0, 3);
-  show.forEach(function(s) {
-    var d = new Date(s.created_at);
-    var dateStr = d.toLocaleDateString("en-US", {weekday:"short",month:"short",day:"numeric",year:"numeric"}) + " at " + d.toLocaleTimeString("en-US", {hour:"2-digit",minute:"2-digit"});
-    html += "<div class=\"sl-entry\">";
-    html += "<div class=\"sl-entry-header\">";
-    html += "<span class=\"sl-entry-author\">" + escapeHtml(s.author) + "</span>";
-    html += "<div><span class=\"sl-entry-date\">" + dateStr + "</span>";
-    if (s.author === currentUser) html += "<span class=\"sl-entry-delete\" onclick=\"deleteSession('" + s.id + "')\">delete</span>";
-    html += "</div></div>";
-    html += "<div class=\"sl-entry-body\">" + escapeHtml(s.summary) + "</div>";
-    html += "</div>";
-  });
-  if (allSessions.length > 3) {
-    html += "<a href=\"logs.html\" style=\"display:block;text-align:center;padding:12px;font-size:13px;color:var(--blue);text-decoration:none\">View all " + allSessions.length + " session logs →</a>";
-  }
-  container.innerHTML = html;
-}
-
-async function postSession() {
-  if (!isAdmin) { alert("Switch to Admin mode to log sessions."); return; }
-  var input = document.getElementById("slInput");
-  if (!input || !input.value.trim()) return;
-  var body = input.value.trim();
-  input.value = "";
-  try {
-    var row = await sbFetch("tracker_sessions", {method: "POST", body: JSON.stringify({author: currentUser, summary: body})});
-    if (Array.isArray(row)) allSessions = row.concat(allSessions);
-    else if (row) allSessions.unshift(row);
-    renderSessions();
-  } catch(e) { console.error("Failed to post session:", e); }
-}
-
-async function deleteSession(id) {
-  if (!isAdmin) { alert("Switch to Admin mode to delete."); return; }
-  await sbFetch("tracker_sessions?id=eq." + id, {method: "DELETE"});
-  allSessions = allSessions.filter(function(s) { return s.id !== id; });
-  renderSessions();
-}
-
-function toggleSessionLog() {
-  sessionLogCollapsed = !sessionLogCollapsed;
-  var el = document.getElementById("sessionLog");
-  if (sessionLogCollapsed) el.classList.add("collapsed");
-  else el.classList.remove("collapsed");
 }
 
 // Filters
