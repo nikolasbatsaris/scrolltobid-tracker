@@ -797,11 +797,11 @@ function renderSessions() {
     var dateStr = d.toLocaleDateString("en-US", {weekday:"short",month:"short",day:"numeric",year:"numeric"}) + " at " + d.toLocaleTimeString("en-US", {hour:"2-digit",minute:"2-digit"});
     html += "<div class=\"sl-entry\">";
     html += "<div class=\"sl-entry-header\">";
-    html += "<span class=\"sl-entry-author\">" + esc(s.author) + "</span>";
+    html += "<span class=\"sl-entry-author\">" + escapeHtml(s.author) + "</span>";
     html += "<div><span class=\"sl-entry-date\">" + dateStr + "</span>";
     if (s.author === currentUser) html += "<span class=\"sl-entry-delete\" onclick=\"deleteSession('" + s.id + "')\">delete</span>";
     html += "</div></div>";
-    html += "<div class=\"sl-entry-body\">" + esc(s.summary) + "</div>";
+    html += "<div class=\"sl-entry-body\">" + escapeHtml(s.summary) + "</div>";
     html += "</div>";
   });
   container.innerHTML = html;
