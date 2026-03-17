@@ -886,6 +886,7 @@ function handleCommentKey(e, taskId) {
 }
 
 function submitComment(taskId) {
+  if (!isAdmin) { alert("Switch to Admin mode to comment."); return; }
   var input = document.getElementById("input-" + taskId);
   if (!input) return;
   var body = input.value.trim();
@@ -932,6 +933,7 @@ function renderSessions() {
 }
 
 async function postSession() {
+  if (!isAdmin) { alert("Switch to Admin mode to log sessions."); return; }
   var input = document.getElementById("slInput");
   if (!input || !input.value.trim()) return;
   var body = input.value.trim();
