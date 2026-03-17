@@ -683,10 +683,9 @@ function sendCommand() {
   btn.disabled = true;
   btn.textContent = "Sending\u2026";
   var payload = {
-    command: text,
+    message: text,
     target: target,
-    sent_by: currentUser,
-    created_at: new Date().toISOString()
+    from_user: currentUser
   };
   sbReq("POST", "tracker_commands", payload, function(status, data) {
     btn.disabled = false;
