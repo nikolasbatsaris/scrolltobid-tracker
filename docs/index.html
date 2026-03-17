@@ -563,7 +563,7 @@ function showApp() {
   document.getElementById("headerUser").textContent = currentUser;
   if (sessionStorage.getItem("stb-admin") === "1") isAdmin = true;
   updateAdminUI();
-  loadComments().then(function() { render(); setupRealtime(); });
+  Promise.all([loadComments(), loadStatuses(), loadChecks()]).then(function() { render(); setupRealtime(); });
   loadSessions();
 }
 
@@ -588,12 +588,14 @@ var STATUS_CYCLE = ["not-started", "in-progress", "done"];
 var STATUS_LABEL = {"not-started": "Not Started", "in-progress": "In Progress", "done": "Done"};
 var STATUS_ICON = {"not-started": "\u25CB", "in-progress": "\u25D1", "done": "\u25CF"};
 
-function loadStatuses() {
-  try { return JSON.parse(localStorage.getItem("stb-statuses")) || {}; }
-  catch(e) { return {}; }
+var statuses = {};
+async function loadStatuses() {
+  try {
+    var rows = await sbFetch("tracker_statuses?select=id,status");
+    statuses = {};
+    rows.forEach(function(r) { statuses[r.id] = r.status; });
+  } catch(e) { statuses = {}; }
 }
-function saveStatuses(s) { localStorage.setItem("stb-statuses", JSON.stringify(s)); }
-var statuses = loadStatuses();
 function getStatus(id) { return statuses[id] || "not-started"; }
 function cycleStatus(id, e) {
   e.stopPropagation();
@@ -601,27 +603,34 @@ function cycleStatus(id, e) {
   var cur = getStatus(id);
   var next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(cur) + 1) % 3];
   statuses[id] = next;
-  saveStatuses(statuses);
   render();
+  sbFetch("tracker_statuses", {method: "POST", headers: Object.assign({}, SB_HEADERS, {"Prefer": "return=representation,resolution=merge-duplicates"}), body: JSON.stringify({id: id, status: next, updated_by: currentUser, updated_at: new Date().toISOString()})}).catch(function(e) { console.error("Status save error:", e); });
+}
+function setStatusAPI(id, status) {
+  statuses[id] = status;
+  return sbFetch("tracker_statuses", {method: "POST", headers: Object.assign({}, SB_HEADERS, {"Prefer": "return=representation,resolution=merge-duplicates"}), body: JSON.stringify({id: id, status: status, updated_by: currentUser || "Claude (Manager)", updated_at: new Date().toISOString()})});
 }
 
 // ── Feature checks (per-feature checkboxes) ──
-function loadChecks() {
-  try { return JSON.parse(localStorage.getItem("stb-checks")) || {}; }
-  catch(e) { return {}; }
+var featureChecks = {};
+async function loadChecks() {
+  try {
+    var rows = await sbFetch("tracker_feature_checks?select=id,checked");
+    featureChecks = {};
+    rows.forEach(function(r) { if(r.checked) featureChecks[r.id] = true; });
+  } catch(e) { featureChecks = {}; }
 }
-function saveChecks(c) { localStorage.setItem("stb-checks", JSON.stringify(c)); }
-var featureChecks = loadChecks();
 function toggleCheck(cardId, idx, e) {
   e.stopPropagation();
   if (!isAdmin) { alert("Switch to Admin mode to edit."); return; }
   var key = cardId + ":" + idx;
   if (featureChecks[key]) {
     delete featureChecks[key];
+    sbFetch("tracker_feature_checks?id=eq." + encodeURIComponent(key), {method: "DELETE"}).catch(function(e) {});
   } else {
     featureChecks[key] = true;
+    sbFetch("tracker_feature_checks", {method: "POST", headers: Object.assign({}, SB_HEADERS, {"Prefer": "return=representation,resolution=merge-duplicates"}), body: JSON.stringify({id: key, checked: true, updated_by: currentUser, updated_at: new Date().toISOString()})}).catch(function(e) {});
   }
-  saveChecks(featureChecks);
   render();
   // Re-open the card
   setTimeout(function() {
